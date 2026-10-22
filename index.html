@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Multi-AI Prompt Studio | ZuzTalk Debate Engine</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Marked.js for parsing Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              800: '#5b21b6',
+              900: '#4c1d95',
+            },
+            surface: {
+              dark: '#0B0F19',
+              card: '#111827',
+              border: '#1F2937',
+              accent: '#1E293B'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.7);
+    }
+
+    /* Markdown Styling in Prompt outputs */
+    .prose-custom h1, .prose-custom h2, .prose-custom h3 {
+      color: #F3F4F6;
+      font-weight: 700;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .prose-custom h1 { font-size: 1.35rem; border-bottom: 1px solid #374151; padding-bottom: 0.4rem; }
+    .prose-custom h2 { font-size: 1.15rem; color: #C4B5FD; }
+    .prose-custom h3 { font-size: 1.0rem; color: #93C5FD; }
+    .prose-custom p { margin-bottom: 0.75rem; line-height: 1.6; color: #D1D5DB; font-size: 0.925rem; }
+    .prose-custom ul, .prose-custom ol { margin-left: 1.25rem; margin-bottom: 0.75rem; list-style-type: disc; color: #D1D5DB; font-size: 0.925rem; }
+    .prose-custom li { margin-bottom: 0.35rem; }
+    .prose-custom strong { color: #FFFFFF; font-weight: 600; }
+    .prose-custom code {
+      font-family: 'JetBrains Mono', monospace;
+      background-color: #1F2937;
+      color: #F472B6;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.825rem;
+    }
+    .prose-custom pre {
+      background-color: #0F172A;
+      border: 1px solid #1E293B;
+      padding: 0.85rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin-bottom: 0.85rem;
+    }
+    .prose-custom pre code {
+      background-color: transparent;
+      padding: 0;
+      color: #E2E8F0;
+    }
+    .prose-custom blockquote {
+      border-left: 3px solid #8B5CF6;
+      padding-left: 0.85rem;
+      font-style: italic;
+      color: #9CA3AF;
+      margin: 0.75rem 0;
+    }
+
+    /* Subtle pulse animation for active step */
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(139, 92, 246, 0.8); box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
+      50% { border-color: rgba(99, 102, 241, 0.4); box-shadow: 0 0 5px rgba(99, 102, 241, 0.1); }
+    }
+    .active-stage-glow {
+      animation: pulse-border 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="bg-surface-dark text-slate-100 min-h-screen flex flex-col font-sans selection:bg-brand-600 selection:text-white pb-20 md:pb-8">
+
+  <!-- TOP APP BAR -->
+  <header class="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 transition-all">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/25 ring-1 ring-white/20">
+          <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base font-bold tracking-tight text-white">Prompt Studio</h1>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">Debate Engine</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium hidden sm:block">ZuzTalk Multi-Agent Architecture Consensus</p>
+        </div>
+      </div>
+
+      <!-- Action Icons / Key Manager -->
+      <div class="flex items-center space-x-2">
+        <button id="historyToggleBtn" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition active:scale-95">
+          <i data-lucide="history" class="w-4 h-4 text-slate-400"></i>
+          <span class="hidden sm:inline">History</span>
+        </button>
+
+        <button id="openSettingsBtn" class="relative flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-950/40 hover:bg-indigo-900/40 text-indigo-200 border border-indigo-700/40 transition active:scale-95">
+          <i data-lucide="key" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>API Keys</span>
+          <span id="keyStatusBadge" class="w-2 h-2 rounded-full bg-amber-400" title="API keys not configured (Using Demo Mode)"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-5 flex flex-col gap-6">
+
+    <!-- INPUT & CONFIGURATION CARD -->
+    <section class="bg-surface-card border border-surface-border rounded-2xl p-4 sm:p-5 shadow-2xl relative overflow-hidden backdrop-blur-md">
+      <div class="absolute -top-24 -right-24 w-60 h-60 bg-brand-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Quick Preset Chips -->
+      <div class="mb-3">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="zap" class="w-3.5 h-3.5 text-brand-400"></i> Quick Issue Templates
+          </label>
+          <span class="text-[11px] text-slate-400">Tap to load</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5 pb-1 overflow-x-auto text-xs">
+          <button class="preset-chip px-2.5 py-1 rounded-full bg-slate-800 hover:bg-brand-900/40 hover:border-brand-500/50 border border-slate-700/70 text-slate-300 transition text-[11.5px] whitespace-nowrap active:scale-95" 
+            data-preset="Media pipeline audit: standardize gallery video to 720p HD H.264, async background worker with concurrency limits, Sharp image WebP variants (256px, 480px, 1600px), delete original after attachment, and purge CDN cache on media removal.">
+            📹 720p Video & WebP Pipeline
+          </button>
+          <button class="preset-chip px-2.5 py-1 rounded-full bg-slate-800 hover:bg-brand-900/40 hover:border-brand-500/50 border border-slate-700/70 text-slate-300 transition text-[11.5px] whitespace-nowrap active:scale-95" 
+            data-preset="OTP rate limiter fix: relax aggressive 11-minute lockout to progressive backoff (30s resend, 3 attempts / 5 mins, 3 min lockout). Fix mobile UI to display a single alert card and replace static 'Please wait...' button with live MM:SS countdown badge.">
+            ⏳ OTP Rate Limiter & Ticking UI
+          </button>
+          <button class="preset-chip px-2.5 py-1 rounded-full bg-slate-800 hover:bg-brand-900/40 hover:border-brand-500/50 border border-slate-700/70 text-slate-300 transition text-[11.5px] whitespace-nowrap active:scale-95" 
+            data-preset="WebRTC connection drop recovery: handling caller switching between Wi-Fi and 5G mid-call without session termination. Re-ice negotiation, 15-second grace period before teardown, and idempotent per-second ledger reconciliation.">
+            📶 WebRTC Wi-Fi ↔ 5G Recovery
+          </button>
+          <button class="preset-chip px-2.5 py-1 rounded-full bg-slate-800 hover:bg-brand-900/40 hover:border-brand-500/50 border border-slate-700/70 text-slate-300 transition text-[11.5px] whitespace-nowrap active:scale-95" 
+            data-preset="Talker payout bank transfer: Section 194-O TDS automated 1% calculation, RazorpayX fund account creation with penny-drop verification, withdrawal requests, and balance lock in non-refundable wallet.">
+            💳 Talker Payout & TDS 194-O
+          </button>
+        </div>
+      </div>
+
+      <!-- Task Input Area -->
+      <div class="relative">
+        <textarea id="taskInput" rows="4" 
+          placeholder="Describe the bug, feature, or optimization task in detail (e.g. 'Audit call signaling timeout and build retryable backoff when talker is busy...')"
+          class="w-full bg-slate-950/70 border border-slate-700/80 rounded-xl p-3.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition shadow-inner font-sans resize-none leading-relaxed"></textarea>
+      </div>
+
+      <!-- Execution Bar -->
+      <div class="mt-3.5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Gemini Architect</span>
+          </div>
+          <span>➜</span>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+            <span>QA Critic</span>
+          </div>
+          <span>➜</span>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-brand-400"></span>
+            <span>Replit Prompt</span>
+          </div>
+        </div>
+
+        <button id="runDebateBtn" class="flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-lg shadow-brand-600/30 active:scale-[0.98] transition">
+          <i data-lucide="play" class="w-4 h-4 fill-white"></i>
+          <span>Run Multi-AI Debate</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- LIVE STAGES PROGRESS MONITOR (Collapsible / Dynamic) -->
+    <section id="stagesProgressSection" class="hidden flex-col gap-2.5 transition-all duration-300">
+      <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 px-1 flex items-center justify-between">
+        <span class="flex items-center gap-1.5">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+          </span>
+          Debate Pipeline Live Execution
+        </span>
+        <span id="elapsedTimer" class="font-mono text-slate-400 text-[11px]">0.0s</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+        <!-- Stage 1 -->
+        <div id="stageCard1" class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex items-start gap-3 transition-all duration-300">
+          <div id="stageIcon1" class="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 text-xs font-mono">1</div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <h4 class="text-xs font-semibold text-slate-200">Gemini Architect</h4>
+              <span id="stageBadge1" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">Waiting</span>
+            </div>
+            <p id="stageDesc1" class="text-[11px] text-slate-400 truncate mt-0.5">Drafting architecture, data models & endpoints</p>
+          </div>
+        </div>
+
+        <!-- Stage 2 -->
+        <div id="stageCard2" class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex items-start gap-3 transition-all duration-300">
+          <div id="stageIcon2" class="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 text-xs font-mono">2</div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <h4 class="text-xs font-semibold text-slate-200">QA Staff Reviewer</h4>
+              <span id="stageBadge2" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">Waiting</span>
+            </div>
+            <p id="stageDesc2" class="text-[11px] text-slate-400 truncate mt-0.5">Adversarial audit for race conditions & edge cases</p>
+          </div>
+        </div>
+
+        <!-- Stage 3 -->
+        <div id="stageCard3" class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex items-start gap-3 transition-all duration-300">
+          <div id="stageIcon3" class="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 text-xs font-mono">3</div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <h4 class="text-xs font-semibold text-slate-200">Replit Synthesis</h4>
+              <span id="stageBadge3" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">Waiting</span>
+            </div>
+            <p id="stageDesc3" class="text-[11px] text-slate-400 truncate mt-0.5">Reconciling & building guarded prompt</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OUTPUT CONTAINER (TABBED INTERFACE) -->
+    <section id="resultsSection" class="hidden flex-col bg-surface-card border border-surface-border rounded-2xl shadow-2xl overflow-hidden">
+      
+      <!-- Tab Headers & Actions -->
+      <div class="bg-slate-950/90 border-b border-slate-800/80 px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+        
+        <!-- Navigation Tabs -->
+        <div class="flex items-center space-x-1 overflow-x-auto text-xs py-1" id="tabGroup">
+          <button class="tab-btn active px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 bg-brand-600/30 text-brand-300 border border-brand-500/40" data-target="tabUnifiedPrompt">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+            <span>Final Replit Prompt</span>
+          </button>
+          <button class="tab-btn px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition flex items-center gap-1.5 border border-transparent" data-target="tabArchitect">
+            <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+            <span>1. Architect Plan</span>
+          </button>
+          <button class="tab-btn px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition flex items-center gap-1.5 border border-transparent" data-target="tabCritic">
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+            <span>2. QA Critique</span>
+          </button>
+        </div>
+
+        <!-- Quick Output Actions -->
+        <div class="flex items-center space-x-2">
+          <button id="downloadMdBtn" class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 flex items-center gap-1.5 active:scale-95 transition" title="Download markdown file">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">.md</span>
+          </button>
+          <button id="copyPromptBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white shadow-md shadow-brand-600/20 flex items-center gap-1.5 active:scale-95 transition">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span id="copyBtnText">Copy Prompt</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Contents -->
+      <div class="p-4 sm:p-6 bg-slate-950/40 min-h-[350px]">
+        
+        <!-- Tab 1: Unified Replit Prompt (Default) -->
+        <div id="tabUnifiedPrompt" class="tab-content block">
+          <div class="mb-3 flex items-center justify-between text-xs text-slate-400">
+            <span class="font-mono text-emerald-400 flex items-center gap-1">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i> Ready to paste into Replit Agent
+            </span>
+            <span id="tokenOrCharCount" class="font-mono text-[11px] text-slate-500"></span>
+          </div>
+          <div id="unifiedPromptMarkdown" class="prose-custom max-w-none font-sans text-sm selection:bg-brand-700"></div>
+        </div>
+
+        <!-- Tab 2: Architect Plan -->
+        <div id="tabArchitect" class="tab-content hidden">
+          <div class="mb-3 text-xs text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-blue-400"></i>
+            <span>Raw architectural breakdown and data model proposal generated by Gemini Architect.</span>
+          </div>
+          <div id="architectPlanMarkdown" class="prose-custom max-w-none font-sans text-sm"></div>
+        </div>
+
+        <!-- Tab 3: Critic Review -->
+        <div id="tabCritic" class="tab-content hidden">
+          <div class="mb-3 text-xs text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Adversarial audit highlighting missed race conditions, UX flaws, and unhandled edge cases.</span>
+          </div>
+          <div id="criticReviewMarkdown" class="prose-custom max-w-none font-sans text-sm"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RECENT HISTORY DRAWER / MODAL -->
+  <div id="historyModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+    <div class="bg-surface-card border border-surface-border w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <i data-lucide="history" class="w-4 h-4 text-brand-400"></i>
+          <h3 class="text-sm font-bold text-white">Prompt Generation History</h3>
+        </div>
+        <button id="closeHistoryBtn" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div id="historyListContainer" class="flex-1 overflow-y-auto py-3 space-y-2 text-xs">
+        <!-- Rendered dynamically -->
+        <div class="text-center py-8 text-slate-500">No prompt history yet.</div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+        <button id="clearHistoryBtn" class="text-rose-400 hover:text-rose-300 transition">Clear History</button>
+        <span class="text-slate-500">Stored locally in browser</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- API KEYS SETTINGS MODAL -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+    <div class="bg-surface-card border border-surface-border w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 shadow-2xl flex flex-col space-y-4">
+      
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400">
+            <i data-lucide="key" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white">API Configuration</h3>
+            <p class="text-[11px] text-slate-400">Keys remain in your browser's private local storage</p>
+          </div>
+        </div>
+        <button id="closeSettingsBtn" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Gemini Key Input -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+          <span>Gemini API Key</span>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[11px] text-brand-400 hover:underline flex items-center gap-1">Get Key <i data-lucide="external-link" class="w-3 h-3"></i></a>
+        </label>
+        <div class="relative">
+          <input type="password" id="geminiKeyInput" placeholder="AIzaSy..." 
+            class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono">
+          <button type="button" class="toggle-mask absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-200" data-input="geminiKeyInput">
+            <i data-lucide="eye" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- OpenAI Key Input -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+          <span>OpenAI API Key</span>
+          <a href="https://platform.openai.com/api-keys" target="_blank" class="text-[11px] text-indigo-400 hover:underline flex items-center gap-1">Get Key <i data-lucide="external-link" class="w-3 h-3"></i></a>
+        </label>
+        <div class="relative">
+          <input type="password" id="openaiKeyInput" placeholder="sk-..." 
+            class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono">
+          <button type="button" class="toggle-mask absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-200" data-input="openaiKeyInput">
+            <i data-lucide="eye" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-[11.5px] text-slate-400 space-y-1">
+        <p class="font-medium text-slate-300 flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Local & Zero-Server Storage
+        </p>
+        <p>If keys are left blank, the app runs in <strong>Interactive High-Fidelity Demo Simulation Mode</strong> so you can test on mobile without burning credits.</p>
+      </div>
+
+      <div class="flex items-center gap-2 pt-2">
+        <button id="saveKeysBtn" class="flex-1 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs transition active:scale-95 shadow-md shadow-brand-600/30">
+          Save Configuration
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FLOATING TOAST -->
+  <div id="toastMessage" class="fixed bottom-5 right-5 z-50 bg-slate-900 border border-slate-700 text-white text-xs px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+    <span id="toastText">Prompt copied to clipboard!</span>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Initialize Lucide Icons
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      initApp();
+    });
+
+    const PROJECT_CONTEXT = `
+Project: ZuzTalk
+Platform: 1:1 real-time voice and video marketplace for casual and entertainment talk.
+Stack: Node.js/PostgreSQL backend on Railway, React Native/Expo mobile app, Razorpay payment gateway, closed-loop wallet (non-refundable), ephemeral WebRTC calls (no recording/replays).
+    `.trim();
+
+    // State
+    const state = {
+      isProcessing: false,
+      geminiKey: localStorage.getItem('zt_gemini_key') || '',
+      openaiKey: localStorage.getItem('zt_openai_key') || '',
+      history: JSON.parse(localStorage.getItem('zt_prompt_history') || '[]'),
+      currentResult: null,
+      timerInterval: null,
+      startTime: null
+    };
+
+    function initApp() {
+      updateKeyStatusUI();
+      renderHistoryList();
+
+      // Setup Presets
+      document.querySelectorAll('.preset-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.getElementById('taskInput').value = chip.getAttribute('data-preset');
+          document.getElementById('taskInput').focus();
+        });
+      });
+
+      // Settings Modal toggles
+      document.getElementById('openSettingsBtn').addEventListener('click', openSettings);
+      document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+      document.getElementById('saveKeysBtn').addEventListener('click', saveKeys);
+
+      // History Modal toggles
+      document.getElementById('historyToggleBtn').addEventListener('click', openHistory);
+      document.getElementById('closeHistoryBtn').addEventListener('click', closeHistory);
+      document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+
+      // Mask password toggle buttons
+      document.querySelectorAll('.toggle-mask').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-input');
+          const input = document.getElementById(targetId);
+          if (input.type === 'password') {
+            input.type = 'text';
+            btn.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i>';
+          } else {
+            input.type = 'password';
+            btn.innerHTML = '<i data-lucide="eye" class="w-4 h-4"></i>';
+          }
+          lucide.createIcons();
+        });
+      });
+
+      // Tab switching
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('active', 'bg-brand-600/30', 'text-brand-300', 'border-brand-500/40');
+            b.classList.add('text-slate-400', 'border-transparent');
+          });
+          btn.classList.add('active', 'bg-brand-600/30', 'text-brand-300', 'border-brand-500/40');
+          btn.classList.remove('text-slate-400', 'border-transparent');
+
+          const target = btn.getAttribute('data-target');
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+          document.getElementById(target).classList.remove('hidden');
+        });
+      });
+
+      // Action buttons
+      document.getElementById('runDebateBtn').addEventListener('click', startDebateFlow);
+      document.getElementById('copyPromptBtn').addEventListener('click', copyPromptToClipboard);
+      document.getElementById('downloadMdBtn').addEventListener('click', downloadPromptMarkdown);
+    }
+
+    // Modal Handlers
+    function openSettings() {
+      document.getElementById('geminiKeyInput').value = state.geminiKey;
+      document.getElementById('openaiKeyInput').value = state.openaiKey;
+      const modal = document.getElementById('settingsModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSettings() {
+      const modal = document.getElementById('settingsModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveKeys() {
+      state.geminiKey = document.getElementById('geminiKeyInput').value.trim();
+      state.openaiKey = document.getElementById('openaiKeyInput').value.trim();
+      localStorage.setItem('zt_gemini_key', state.geminiKey);
+      localStorage.setItem('zt_openai_key', state.openaiKey);
+      updateKeyStatusUI();
+      closeSettings();
+      showToast('API credentials saved safely!');
+    }
+
+    function updateKeyStatusUI() {
+      const badge = document.getElementById('keyStatusBadge');
+      if (state.geminiKey && state.openaiKey) {
+        badge.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50';
+        badge.title = 'Live API keys active';
+      } else if (state.geminiKey || state.openaiKey) {
+        badge.className = 'w-2 h-2 rounded-full bg-amber-400';
+        badge.title = 'Partial keys configured (Hybrid mode)';
+      } else {
+        badge.className = 'w-2 h-2 rounded-full bg-slate-500';
+        badge.title = 'No API keys (Running demo simulation mode)';
+      }
+    }
+
+    function openHistory() {
+      renderHistoryList();
+      const modal = document.getElementById('historyModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeHistory() {
+      const modal = document.getElementById('historyModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function clearHistory() {
+      state.history = [];
+      localStorage.removeItem('zt_prompt_history');
+      renderHistoryList();
+      showToast('History cleared');
+    }
+
+    function renderHistoryList() {
+      const container = document.getElementById('historyListContainer');
+      if (!state.history || state.history.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-500">No prompt history yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = state.history.map((item, index) => `
+        <div class="p-3 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 rounded-xl cursor-pointer transition flex items-center justify-between group" onclick="loadHistoryItem(${index})">
+          <div class="min-w-0 pr-2">
+            <h5 class="text-slate-200 font-semibold truncate text-xs">${escapeHtml(item.task)}</h5>
+            <span class="text-[10px] text-slate-400">${item.timestamp}</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-brand-400 transition shrink-0"></i>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    window.loadHistoryItem = function(index) {
+      const item = state.history[index];
+      if (!item) return;
+      document.getElementById('taskInput').value = item.task;
+      renderResults(item.result);
+      closeHistory();
+      showToast('Loaded past prompt!');
+    };
+
+    // Live Execution and Multi-AI Pipeline
+    async function startDebateFlow() {
+      const task = document.getElementById('taskInput').value.trim();
+      if (!task) {
+        showToast('Please enter an issue or select a preset chip first');
+        return;
+      }
+
+      if (state.isProcessing) return;
+      state.isProcessing = true;
+
+      // Reset & Show Stages
+      const runBtn = document.getElementById('runDebateBtn');
+      runBtn.disabled = true;
+      runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      const stagesSection = document.getElementById('stagesProgressSection');
+      stagesSection.classList.remove('hidden');
+      stagesSection.classList.add('flex');
+
+      document.getElementById('resultsSection').classList.add('hidden');
+
+      // Start elapsed timer
+      state.startTime = Date.now();
+      clearInterval(state.timerInterval);
+      state.timerInterval = setInterval(() => {
+        const sec = ((Date.now() - state.startTime) / 1000).toFixed(1);
+        document.getElementById('elapsedTimer').innerText = `${sec}s`;
+      }, 100);
+
+      try {
+        let architectPlan = '';
+        let criticReview = '';
+        let finalPrompt = '';
+
+        // Determine mode: Live API vs Simulation
+        const hasLiveKeys = state.geminiKey.length > 5;
+
+        // ================= STAGE 1: GEMINI ARCHITECT =================
+        setStageState(1, 'active', 'Analyzing ZuzTalk Architecture...');
+        setStageState(2, 'waiting', 'Queued for critique');
+        setStageState(3, 'waiting', 'Queued for synthesis');
+
+        if (hasLiveKeys) {
+          architectPlan = await callGeminiArchitectAPI(task, state.geminiKey);
+        } else {
+          await sleep(1400);
+          architectPlan = simulateArchitectPlan(task);
+        }
+        setStageState(1, 'done', 'Architecture & data flow drafted');
+
+        // ================= STAGE 2: QA STAFF CRITIC =================
+        setStageState(2, 'active', 'Scanning for race conditions & edge cases...');
+        if (state.openaiKey && state.openaiKey.length > 5) {
+          criticReview = await callOpenAICriticAPI(task, architectPlan, state.openaiKey);
+        } else if (hasLiveKeys) {
+          // Fallback to Gemini with Critic persona if only Gemini key is provided
+          criticReview = await callGeminiCriticFallback(task, architectPlan, state.geminiKey);
+        } else {
+          await sleep(1400);
+          criticReview = simulateCriticReview(task);
+        }
+        setStageState(2, 'done', 'Adversarial peer review completed');
+
+        // ================= STAGE 3: SYNTHESIS FOR REPLIT =================
+        setStageState(3, 'active', 'Reconciling and locking guarded prompt...');
+        if (hasLiveKeys) {
+          finalPrompt = await callGeminiSynthesisAPI(task, architectPlan, criticReview, state.geminiKey);
+        } else {
+          await sleep(1200);
+          finalPrompt = simulateReplitPrompt(task);
+        }
+        setStageState(3, 'done', 'Guarded prompt locked!');
+
+        // Render Results
+        const resultPayload = {
+          task,
+          architectPlan,
+          criticReview,
+          finalPrompt,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })
+        };
+
+        renderResults(resultPayload);
+
+        // Save to History
+        state.history.unshift(resultPayload);
+        if (state.history.length > 20) state.history.pop();
+        localStorage.setItem('zt_prompt_history', JSON.stringify(state.history));
+        renderHistoryList();
+
+      } catch (err) {
+        console.error("Pipeline failure:", err);
+        showToast('Error during generation: ' + (err.message || 'Check API keys'));
+      } finally {
+        state.isProcessing = false;
+        clearInterval(state.timerInterval);
+        runBtn.disabled = false;
+        runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function setStageState(stageNum, status, text) {
+      const card = document.getElementById(`stageCard${stageNum}`);
+      const icon = document.getElementById(`stageIcon${stageNum}`);
+      const badge = document.getElementById(`stageBadge${stageNum}`);
+      const desc = document.getElementById(`stageDesc${stageNum}`);
+
+      card.classList.remove('active-stage-glow', 'border-brand-500', 'border-emerald-500/40');
+
+      if (status === 'waiting') {
+        badge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400';
+        badge.innerText = 'Waiting';
+        icon.className = 'w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 text-xs font-mono';
+        icon.innerHTML = `${stageNum}`;
+      } else if (status === 'active') {
+        card.classList.add('active-stage-glow', 'border-brand-500');
+        badge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30';
+        badge.innerText = 'Processing...';
+        icon.className = 'w-7 h-7 rounded-lg bg-brand-600/30 text-brand-300 flex items-center justify-center shrink-0 text-xs font-mono animate-spin';
+        icon.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4"></i>';
+      } else if (status === 'done') {
+        card.classList.add('border-emerald-500/40');
+        badge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        badge.innerText = 'Completed';
+        icon.className = 'w-7 h-7 rounded-lg bg-emerald-600/30 text-emerald-300 flex items-center justify-center shrink-0 text-xs font-mono';
+        icon.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
+      }
+
+      if (text) desc.innerText = text;
+      lucide.createIcons();
+    }
+
+    function renderResults(result) {
+      state.currentResult = result;
+      const resultsSection = document.getElementById('resultsSection');
+      resultsSection.classList.remove('hidden');
+      resultsSection.classList.add('flex');
+
+      // Populate tabs with parsed markdown
+      document.getElementById('unifiedPromptMarkdown').innerHTML = marked.parse(result.finalPrompt);
+      document.getElementById('architectPlanMarkdown').innerHTML = marked.parse(result.architectPlan);
+      document.getElementById('criticReviewMarkdown').innerHTML = marked.parse(result.criticReview);
+
+      document.getElementById('tokenOrCharCount').innerText = `${result.finalPrompt.length} chars`;
+
+      // Scroll smoothly to output
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Direct Gemini API Call
+    async function callGeminiArchitectAPI(task, apiKey) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
+      const prompt = `
+${PROJECT_CONTEXT}
+
+You are the Lead Systems Architect. Analyze this task/issue:
+"${task}"
+
+Provide:
+1. Architectural & Data Model Design.
+2. API route and lifecycle requirements.
+3. Failure modes, edge cases, and safety boundaries.
+Do NOT write code yet. Focus on architecture and requirements.
+      `;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData?.error?.message || 'Gemini API Error');
+      }
+
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    // Direct OpenAI API Call
+    async function callOpenAICriticAPI(task, architectPlan, apiKey) {
+      const url = `https://api.openai.com/v1/chat/completions`;
+      const prompt = `
+${PROJECT_CONTEXT}
+
+Proposed Architecture:
+${architectPlan}
+
+Task requirement: "${task}"
+
+Act as a Principal Staff Engineer and QA Adversary. Critically review this proposal:
+1. What did it miss regarding race conditions, concurrency, or network drops (e.g., lockouts, background transitions)?
+2. Where could this break user experience or introduce edge cases?
+3. What constraints or corrections are necessary before coding?
+      `;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.2
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err?.error?.message || 'OpenAI API Error');
+      }
+
+      const data = await response.json();
+      return data.choices[0].message.content;
+    }
+
+    // Fallback critic using Gemini if user only has Gemini key
+    async function callGeminiCriticFallback(task, architectPlan, apiKey) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
+      const prompt = `
+${PROJECT_CONTEXT}
+
+Proposed Architecture:
+${architectPlan}
+
+Task requirement: "${task}"
+
+Act as a strict QA Adversary and Staff Reliability Engineer:
+Audit this proposed architecture for race conditions, state synchronization mismatches, offline/network drops, and UX traps. Provide pointed corrections.
+      `;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    // Direct Synthesis API Call
+    async function callGeminiSynthesisAPI(task, architectPlan, criticReview, apiKey) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
+      const prompt = `
+${PROJECT_CONTEXT}
+
+Task: "${task}"
+
+ARCHITECT PLAN:
+${architectPlan}
+
+CRITIC AUDIT:
+${criticReview}
+
+TASK:
+Reconcile both perspectives. Output ONLY a clean, comprehensive, and guarded instruction prompt formatted in Markdown, ready to copy-paste directly into Replit Agent.
+Ensure the prompt includes:
+- Clear numbered requirement sections (Ingestion/Backend, Processing/State, Delivery/UI, Edge Cases).
+- Explicit non-destructive execution guardrails (e.g. test in development first, benchmark samples before deployment).
+      `;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    // Robust Clipboard Copy
+    function copyPromptToClipboard() {
+      if (!state.currentResult || !state.currentResult.finalPrompt) return;
+      const text = state.currentResult.finalPrompt;
+
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.top = "-9999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          const btnText = document.getElementById('copyBtnText');
+          btnText.innerText = 'Copied!';
+          setTimeout(() => { btnText.innerText = 'Copy Prompt'; }, 2000);
+          showToast('Prompt copied to clipboard! Ready for Replit.');
+        } else {
+          showToast('Could not copy automatically');
+        }
+      } catch (err) {
+        showToast('Clipboard copy failed');
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    }
+
+    // Markdown File Download
+    function downloadPromptMarkdown() {
+      if (!state.currentResult || !state.currentResult.finalPrompt) return;
+      const blob = new Blob([state.currentResult.finalPrompt], { type: 'text/markdown;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `replit_prompt_${Date.now()}.md`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Downloaded prompt as .md file');
+    }
+
+    // Floating Toast Notification
+    function showToast(message) {
+      const toast = document.getElementById('toastMessage');
+      const text = document.getElementById('toastText');
+      text.innerText = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function escapeHtml(string) {
+      return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // High-Fidelity Simulation Fallbacks (when no API keys are present)
+    function simulateArchitectPlan(task) {
+      return `### Proposed Architecture: Systems Blueprint
+**Target Scope:** ${task}
+
+1. **API Schema & Ingestion Boundaries:**
+   - Enforce payload constraints at route middleware before reaching internal controllers.
+   - Separate raw transient uploads from permanent production asset references.
+   - Use idempotent transaction tokens to prevent redundant processing jobs.
+
+2. **Core State & Lifecycle Handling:**
+   - Introduce explicit status flags: \`PENDING_VERIFICATION\`, \`PROCESSING\`, \`ACTIVE\`, and \`OBSOLETE\`.
+   - Prevent blocking operations on primary WebRTC or API worker threads by offloading heavy work to background workers with capped concurrency.
+
+3. **Storage & Garbage Collection:**
+   - Implement soft-delete and retryable storage deletion queues for superseded or failed objects.
+   - Add backfill scheduling to ensure historical assets are migrated without breaking public references.`;
+    }
+
+    function simulateCriticReview(task) {
+      return `### Adversarial QA & Staff Review
+**Focus Area:** Edge cases, concurrency, and platform compliance.
+
+1. **Race Conditions & Thread Contention:**
+   - *Risk:* Multiple rapid requests during state transitions can trigger orphan object generation or double-deductions.
+   - *Correction:* Implement database-level row locking (\`SELECT FOR UPDATE\`) and optimistic lock versioning.
+
+2. **Network Drops & Mobile Backgrounding:**
+   - *Risk:* If a user minimizes the app or transitions from Wi-Fi to cellular during a critical flow, the client state may desync from the backend ledger.
+   - *Correction:* Grace period heartbeat + client-side state reconciliation on app resume.
+
+3. **Resource & CDN Caching Conflict:**
+   - *Risk:* Immediate deletion breaks active viewing sessions; immutable caching prevents quick takedown of violating content.
+   - *Correction:* Revoke new access tokens immediately while setting moderate TTL (e.g. 24h) on CDN edge nodes with programmatic purge calls.`;
+    }
+
+    function simulateReplitPrompt(task) {
+      return `Let's implement the comprehensive solution for: **${task}**
+
+### 1. Ingestion & Input Guardrails
+- Validate all incoming parameters at the route level with strict schema enforcement.
+- Reject unverified or oversized payloads before streaming to storage.
+- Ensure non-blocking background queue handling with concurrency caps so API responsiveness is never degraded.
+
+### 2. State Management & Concurrency
+- Implement database-level transactions with optimistic locking to prevent race conditions during simultaneous user actions.
+- Gracefully handle mobile network switches (e.g., Wi-Fi to 5G) with idempotent recovery tokens.
+- Maintain visual feedback on the frontend (e.g. non-blocking processing state or countdown badges).
+
+### 3. Cleanup & Storage Hygiene
+- Automatically queue superseded, failed, or expired objects for retryable garbage collection.
+- Enforce CDN cache invalidation when media or sensitive resources are modified or deleted.
+
+### 4. Execution Guardrail
+- **Implement and test in development first.**
+- Do not deploy or run live migrations until local test checks pass.
+- Benchmark sample inputs and print verification metrics before locking configuration.`;
+    }
+  </script>
+</body>
+</html>

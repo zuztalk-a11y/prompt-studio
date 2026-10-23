@@ -765,7 +765,7 @@ Stack: Node.js/PostgreSQL backend on Railway, React Native/Expo mobile app, Razo
 
     // Direct Gemini API Call
     async function callGeminiArchitectAPI(task, apiKey) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${apiKey}`;
       const prompt = `
 ${PROJECT_CONTEXT}
 
@@ -837,7 +837,7 @@ Act as a Principal Staff Engineer and QA Adversary. Critically review this propo
 
     // Fallback critic using Gemini if user only has Gemini key
     async function callGeminiCriticFallback(task, architectPlan, apiKey) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${apiKey}`;
       const prompt = `
 ${PROJECT_CONTEXT}
 
@@ -864,7 +864,7 @@ Audit this proposed architecture for race conditions, state synchronization mism
 
     // Direct Synthesis API Call
     async function callGeminiSynthesisAPI(task, architectPlan, criticReview, apiKey) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${apiKey}`;
       const prompt = `
 ${PROJECT_CONTEXT}
 
